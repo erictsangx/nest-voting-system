@@ -8,9 +8,12 @@ async function bootstrap() {
     .setTitle('Voting-System')
     .setDescription('The Voting-System API description')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
+
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('/api-docs', app, document);
   await app.listen(3000);
 }
+
 bootstrap();
