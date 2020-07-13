@@ -2,7 +2,7 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nes
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-export interface Response<T> {
+export interface ResponseWrapper<T> {
   result: T;
   statusCode: number;
   message: string
@@ -12,8 +12,8 @@ export interface Response<T> {
  * Standardize all responses
  */
 @Injectable()
-export class WrapperInterceptor<T> implements NestInterceptor<T, Response<T>> {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
+export class WrapperInterceptor<T> implements NestInterceptor<T, ResponseWrapper<T>> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<ResponseWrapper<T>> {
     return next.handle().pipe(map(data => (
       {
         result: data === undefined ? null : data,

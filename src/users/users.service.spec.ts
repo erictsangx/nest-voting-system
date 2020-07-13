@@ -12,7 +12,13 @@ describe('UsersService', () => {
     service = module.get<UsersService>(UsersService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it('find a user', async () => {
+    // expect(service).toBeDefined();
+    const result = await service.findOne('chris');
+    expect(result).toEqual({
+      userId: 2,
+      username: 'chris',
+      password: 'secret',
+    });
   });
 });

@@ -1,14 +1,9 @@
-import { Controller, Request, Get, Post, UseGuards, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiUnauthorizedResponse
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 @Controller()
 export class AppController {
@@ -19,8 +14,7 @@ export class AppController {
 
   @Get()
   getHello(): string {
-    // return this.appService.getHello();
-    return undefined
+    return this.appService.getHello();
   }
 
   @ApiOperation({ summary: 'login a user' })
