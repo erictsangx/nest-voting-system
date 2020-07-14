@@ -4,7 +4,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { jwtConstants } from './constants';
 import { Chance } from 'chance';
-import { UsersService } from '../users/users.service';
+import { UserService } from '../user/user.service';
 import * as argon2 from 'argon2';
 
 describe('AuthService', () => {
@@ -35,7 +35,7 @@ describe('AuthService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [AuthService, {
-        provide: UsersService,
+        provide: UserService,
         useValue: mockUsersService
       }],
       imports: [PassportModule,

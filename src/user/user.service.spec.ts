@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
+import { UserService } from './user.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.schema';
 
@@ -10,8 +10,8 @@ import { Model } from 'mongoose';
 
 import { Chance } from 'chance';
 
-describe('UsersService', () => {
-  let service: UsersService;
+describe('UserService', () => {
+  let service: UserService;
   let model: Model<User>;
   let container: StartedTestContainer;
 
@@ -47,10 +47,10 @@ describe('UsersService', () => {
         MongooseModule.forRoot(`mongodb://mongoadmin:pass@${ip}:${port}/votingSystem?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false`),
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])
       ],
-      providers: [UsersService],
+      providers: [UserService],
     }).compile();
 
-    service = module.get<UsersService>(UsersService);
+    service = module.get<UserService>(UserService);
     model = module.get<Model<User>>('UserModel');
 
     await new model(userA).save();
@@ -75,4 +75,5 @@ describe('UsersService', () => {
   afterAll(async () => {
     await container.stop();
   });
+
 });
