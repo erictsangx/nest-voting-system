@@ -3,6 +3,13 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { jwtConstants } from './constants';
 
+interface JwtPayload {
+  sub: string
+  username: string
+  exp: number
+  iat: number
+}
+
 /**
  * Verify token: header[Authorization]
  */
@@ -16,8 +23,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: any) {
-    console.log('payload', payload);
+  //[Passport] return payload after verification
+  validate(payload: JwtPayload) {
     return { id: payload.sub, username: payload.username };
   }
 }

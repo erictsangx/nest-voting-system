@@ -9,7 +9,11 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { WrapperInterceptor } from './core/wrapper.interceptor';
 
 @Module({
-  imports: [AuthModule, UsersModule,MongooseModule.forRoot('mongodb://mongoadmin:pass@localhost:27017/votingSystem?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false')],
+  imports: [
+    AuthModule,
+    UsersModule,
+    MongooseModule.forRoot('mongodb://mongoadmin:pass@localhost:27017/votingSystem?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false')
+  ],
   controllers: [AppController],
   providers: [AppService, {
     provide: APP_INTERCEPTOR,

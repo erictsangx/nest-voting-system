@@ -11,8 +11,8 @@ describe('AuthService', () => {
   let service: AuthService;
   let jwt: JwtService;
 
+  //test samples
   const rand = new Chance();
-
   const userA = {
     id: rand.string(),
     username: rand.string(),

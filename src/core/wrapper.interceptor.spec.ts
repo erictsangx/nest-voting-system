@@ -7,6 +7,7 @@ const subject = new WrapperInterceptor();
 
 describe('WrapperInterceptor', () => {
   it('wrap responses', done => {
+
     const expected = [undefined, chance.string(), null];
     const ob = from([...expected].reverse());
     const callHandler = {
@@ -15,11 +16,10 @@ describe('WrapperInterceptor', () => {
       }
     };
 
-    subject.intercept(null, callHandler)
+    subject.intercept({} as any, callHandler)
       .subscribe({
         next: v => {
           const tmp = expected.pop();
-          console.log('tmp', tmp);
           const result = tmp == undefined ? null : tmp;
           expect(v).toEqual({
             result,
