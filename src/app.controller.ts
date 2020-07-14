@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
-import { LocalAuthGuard } from './auth/local-auth.guard';
+import { LoginAuthGuard } from './auth/login-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Request as HttpRequest } from 'express';
+import { ErrorMessage } from './auth/constants';
+import { User } from './users/user.schema';
 
 @Controller()
 export class AppController {
@@ -20,24 +23,24 @@ export class AppController {
   @ApiOperation({ summary: 'login a user' })
   @ApiBody({
     schema: {
-      type: 'object',
       example: {
         username: 'admin',
         password: 'adminPass'
       }
     }
   })
-  @ApiUnauthorizedResponse({ description: 'Wrong username/password' })
-  @UseGuards(LocalAuthGuard)
+  @ApiUnauthorizedResponse({ description: ErrorMessage.loginFailed })
+  @UseGuards(LoginAuthGuard)
   @Post('auth/login')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  login(@Request() req: HttpRequest): string {
+    return this.authService.sign(req.user);
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Request() req: HttpRequest) {
+    console.log('req.user', req.user);
     return req.user;
   }
 
