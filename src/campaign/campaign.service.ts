@@ -4,9 +4,14 @@ import { Model, } from 'mongoose';
 import { Campaign, ICampaign } from './campaign.schema';
 import { VoteCount } from './vote-count.schema';
 import { CampaignDto } from './dto/campaign.dto';
+import { VoteCountDto } from './dto/vote-count.dto';
 
 function toCampaignDto(obj: Campaign): CampaignDto {
   return new CampaignDto(obj.title, obj.startTime, obj.endTime, obj.candidates, obj._id);
+}
+
+function toVoteCountDto(obj: VoteCount): VoteCountDto {
+  return new VoteCountDto(obj.candidateId, obj.count);
 }
 
 @Injectable()
@@ -83,6 +88,18 @@ export class CampaignService {
 
     return list.map((ele) => {
       return toCampaignDto(ele);
+    });
+  }
+
+  async getVoteCount(candidateIds: string[]): Promise<VoteCountDto[] | null> {
+    const list = await this.voteCountModel.find({
+      candidateId: {
+        $in: candidateIds
+      }
+    });
+
+    return list.map((ele) => {
+      return toVoteCountDto(ele);
     });
   }
 }

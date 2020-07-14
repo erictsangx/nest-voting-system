@@ -1,7 +1,8 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CampaignDto } from './dto/campaign.dto';
 import { CampaignService } from './campaign.service';
+import { VoteCountDto } from './dto/vote-count.dto';
 
 @Controller('/api/v1/campaign')
 export class CampaignController {
@@ -9,7 +10,7 @@ export class CampaignController {
   constructor(private readonly campaignService: CampaignService) {}
 
   @Get('list/available')
-  @ApiOperation({ summary: 'available campaigns (startTime<=now<=endTime, sort by total votes DESC' })
+  @ApiOperation({ summary: 'available campaigns (startTime<=now<=endTime, sort by total votes DESC)' })
   @ApiOkResponse({
     type: [CampaignDto],
   })
@@ -24,5 +25,15 @@ export class CampaignController {
   })
   async listExpired(): Promise<CampaignDto[] | null> {
     return this.campaignService.listExpired();
+  }
+
+  @Get('count')
+  @ApiOperation({ summary: 'vote counting of candidates' })
+  @ApiOkResponse({
+    type: [CampaignDto],
+  })
+  async count(@Body() candidateIds: string[]): Promise<VoteCountDto[] | null> {
+    console.log('candidateIds', candidateIds);
+    return this.campaignService.getVoteCount(candidateIds);
   }
 }
