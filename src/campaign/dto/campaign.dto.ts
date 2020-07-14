@@ -1,4 +1,4 @@
-import { ICampaign } from '../campaign.schema';
+import { ICampaign } from '../schema/campaign.schema';
 import { IsDate, IsEmpty, IsNotEmpty, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 

@@ -1,14 +1,15 @@
 import { Body, Controller, Get, Post, Query, UnprocessableEntityException, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CampaignService } from './campaign.service';
-import { Campaign } from './campaign.schema';
+import { Campaign } from './schema/campaign.schema';
 import { Types } from 'mongoose';
 import { CampaignDto } from './dto/campaign.dto';
-import { VoteCount } from './vote-count.schema';
+import { VoteCount } from './schema/vote-count.schema';
 
 const INVALID_DATE = 'startTime > endTime';
 
+@ApiTags('Admin')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @Controller('/api/v1/campaign/admin')
@@ -17,7 +18,7 @@ export class AdminCampaignController {
   constructor(private readonly campaignService: CampaignService) {}
 
   @Post('/create')
-  @ApiResponse({ status: 201, type: CampaignDto})
+  @ApiResponse({ status: 201, type: CampaignDto })
   @ApiUnprocessableEntityResponse({ description: INVALID_DATE })
   async create(@Body() campaignDto: CampaignDto): Promise<CampaignDto | null> {
 
@@ -40,9 +41,11 @@ export class AdminCampaignController {
   // @ApiResponse({ status: 201, description: 'Count all votes of a campaign and update the corresponding vote count' })
   // @ApiUnprocessableEntityResponse({ description: INVALID_DATE })
   // async confirmVoteCount(@Query('campaignId') campaignId: string) {
-  //   const campaign = await this.campaignService.findById(campaignId);
+  //   const campaign = await this.campaignService.findOne(campaignId);
   //
-  //   campaign?.candidates.forEach()
+  //   const countings = campaign?.candidates.forEach(ele => {
+  //     this.campaignService.countVote(ele.id)
+  //   });
   //   console.log('campaign', campaign);
   // }
 }

@@ -1,7 +1,7 @@
 import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { CandidateDto } from './dto/candidate.dto';
-import { CampaignDto } from './dto/campaign.dto';
+import { CandidateDto } from '../dto/candidate.dto';
+import { CampaignDto } from '../dto/campaign.dto';
 
 export interface ICampaign {
   title: string;

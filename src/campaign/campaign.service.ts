@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, } from 'mongoose';
-import { Campaign, ICampaign } from './campaign.schema';
-import { VoteCount } from './vote-count.schema';
+import { Campaign, ICampaign } from './schema/campaign.schema';
+import { VoteCount } from './schema/vote-count.schema';
 import { CampaignDto } from './dto/campaign.dto';
 import { VoteCountDto } from './dto/vote-count.dto';
+import { Vote } from './schema/vote.schema';
+import { VoteDto } from './dto/vote.dto';
 
 function toCampaignDto(obj: Campaign): CampaignDto {
   return new CampaignDto(obj.title, obj.startTime, obj.endTime, obj.candidates, obj._id);
@@ -19,7 +21,8 @@ export class CampaignService {
 
   constructor(
     @InjectModel('Campaign') private readonly campaignModel: Model<Campaign>,
-    @InjectModel('VoteCount') private readonly voteCountModel: Model<VoteCount>
+    @InjectModel('VoteCount') private readonly voteCountModel: Model<VoteCount>,
+    @InjectModel('Vote') private readonly voteModel: Model<Vote>,
   ) {}
 
   async create(createCampaignDto: ICampaign): Promise<CampaignDto | null> {
@@ -31,6 +34,22 @@ export class CampaignService {
     const result = await campaign.save();
     return toCampaignDto(result);
   }
+
+  // async findOne(campaignId: string): Promise<CampaignDto | null> {
+  //   const campaign = await this.campaignModel.findById(campaignId);
+  //   if (campaign != null) {
+  //     return toCampaignDto(campaign);
+  //   }
+  //   return null;
+  // }
+
+  // async countVote(candidateId: string): Promise<CampaignDto | null> {
+  //   const campaign = await this.campaignModel.findById(candidateId);
+  //   if (campaign != null) {
+  //     return toCampaignDto(campaign);
+  //   }
+  //   return null;
+  // }
 
   async listAvailable(): Promise<CampaignDto[] | null> {
     const list = await this.campaignModel
@@ -100,6 +119,36 @@ export class CampaignService {
 
     return list.map((ele) => {
       return toVoteCountDto(ele);
+    });
+  }
+
+  /**
+   * Mongo UNIQUE COMPOUND INDEX(campaignId, hkId)
+   * Ignore duplicated votes
+   */
+  async createVote(voteDto: VoteDto): Promise<Vote | null> {
+    const vote = new this.voteModel(voteDto);
+    try {
+      return await vote.save();
+    } catch (err) {
+      console.warn(err.message);
+      return null;
+    }
+  }
+
+  /**
+   * Increase vote count by 1
+   * @param candidateId
+   */
+  async incVoteCount(candidateId: string): Promise<VoteCount | null> {
+    return this.voteCountModel.updateOne({
+      candidateId: {
+        $eq: candidateId
+      }
+    }, {
+      $inc: {
+        count: 1
+      }
     });
   }
 }
