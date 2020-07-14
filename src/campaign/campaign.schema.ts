@@ -13,24 +13,31 @@ export interface ICampaign {
 @Schema()
 export class Campaign extends Document implements ICampaign {
   @Prop({ required: true })
-  title!: string;
+  title: string;
   @Prop({ required: true })
-  startTime!: Date;
+  startTime: Date;
   @Prop({ required: true })
-  endTime!: Date;
+  endTime: Date;
   @Prop({ required: true })
-  candidates!: CandidateDto[];
+  candidates: CandidateDto[];
 
+  constructor(title: string, startTime: Date, endTime: Date, candidates: CandidateDto[]) {
+    super();
+    this.title = title;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.candidates = candidates;
+  }
 }
 
-const CampaignSchema = SchemaFactory.createForClass(Campaign);
+export const CampaignSchema = SchemaFactory.createForClass(Campaign);
 
-CampaignSchema.methods.toDto = function (): CampaignDto {
-  const obj = this.toObject();
-  return new CampaignDto(obj.title, obj.startTime, obj.endTime, obj.candidates, obj._id);
-};
-
-export { CampaignSchema };
+// CampaignSchema.methods.toDto = function (): CampaignDto {
+//   const obj = this.toObject();
+//   return new CampaignDto(obj.title, obj.startTime, obj.endTime, obj.candidates, obj._id);
+// };
+//
+// export { CampaignSchema };
 
 // export const CampaignSchema = new mongoose.Schema({
 //   title: String,
