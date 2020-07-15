@@ -3,6 +3,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
   ApiUnprocessableEntityResponse
 } from '@nestjs/swagger';
@@ -43,6 +44,7 @@ export class AdminCampaignController {
   }
 
   @ApiOperation({ summary: 'Count all votes of a campaign and update the corresponding vote count' })
+  @ApiQuery({ name: 'campaignId', example: '5efdee7032659b4f24d179a6' })
   @Post('/confirm-vote-count')
   async confirmVoteCount(@Query('campaignId') campaignId: string) {
     const campaign = await this.campaignService.findOne(campaignId);

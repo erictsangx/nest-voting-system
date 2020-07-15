@@ -18,7 +18,7 @@ export class AuthController {
       }
     }
   })
-  @ApiUnauthorizedResponse({ description: ErrorMessage.loginFailed })
+  @ApiUnauthorizedResponse({ description: ErrorMessage.LOGIN_FAILED })
   @UseGuards(LoginAuthGuard)
   @Post('/login')
   login(@Request() req: HttpRequest): string {

@@ -3,5 +3,5 @@ export const jwtConstants = {
 };
 
 export const ErrorMessage = {
-  loginFailed: 'Wrong username/password'
+  LOGIN_FAILED: 'Wrong username/password'
 };

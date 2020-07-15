@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query, UnprocessableEntityException } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
 import { CampaignService } from './campaign.service';
 import { VoteCountEntity } from './entity/vote-count.entity';
 import { VoteDto } from './dto/vote.dto';
@@ -18,12 +18,14 @@ export class CampaignController {
   constructor(private readonly campaignService: CampaignService) {}
 
   @ApiOperation({ summary: 'available campaigns (startTime<=now<=endTime, sort by total votes DESC)' })
+  @ApiOkResponse({ type: [CampaignEntity] })
   @Get('list/available')
   async listAvailable(): Promise<CampaignEntity[] | null> {
     return this.campaignService.listAvailable();
   }
 
   @ApiOperation({ summary: 'expired campaigns (endTime<now, order by endTime, sort by endTime DESC)' })
+  @ApiOkResponse({ type: [CampaignEntity] })
   @Get('list/expired')
   async listExpired(): Promise<CampaignEntity[] | null> {
     return this.campaignService.listExpired();
