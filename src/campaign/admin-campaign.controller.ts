@@ -53,7 +53,7 @@ export class AdminCampaignController {
 
     for (const candidate of campaign.candidates) {
       const counting = await this.campaignService.countVote(candidate.id);
-      await this.campaignService.upsertVoteCount(new VoteCountEntity(candidate.id, counting));
+      await this.campaignService.upsertVoteCount(new VoteCountEntity(candidate.id, counting, new Date()));
     }
   }
 }

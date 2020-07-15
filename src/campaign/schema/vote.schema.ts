@@ -10,6 +10,8 @@ export class Vote extends Document implements IVote {
   campaignId!: string;
   @Prop({ required: true })
   hkId!: string;
+  @Prop({ required: true, default: new Date() })
+  addedAt!: Date;
 }
 
 export const VoteSchema = SchemaFactory.createForClass(Vote);

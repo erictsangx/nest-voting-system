@@ -8,6 +8,8 @@ export class VoteCount extends Document implements IVoteCount {
   candidateId!: string;
   @Prop({ required: true })
   count!: number;
+  @Prop({ required: true })
+  updatedAt!: Date;
 }
 
 export const VoteCountSchema = SchemaFactory.createForClass(VoteCount);

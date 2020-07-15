@@ -25,7 +25,7 @@ export class CampaignService {
   async create(campaignDto: CampaignDto): Promise<CampaignEntity | null> {
     const campaign = new this.campaignModel(campaignDto);
     const zeroCount = campaign.candidates.map(ele => {
-      return { candidateId: ele.id, count: 0 };
+      return { candidateId: ele.id, count: 0, updatedAt: new Date() };
     });
     await this.voteCountModel.insertMany(zeroCount);
     const result = await campaign.save();
@@ -48,13 +48,14 @@ export class CampaignService {
     });
   }
 
-  async upsertVoteCount(voteCountDto: VoteCountEntity): Promise<Query<any>> {
+  async upsertVoteCount(voteCountEntity: VoteCountEntity): Promise<Query<any>> {
     return this.voteCountModel.updateOne({
       candidateId: {
-        $eq: voteCountDto.candidateId
+        $eq: voteCountEntity.candidateId
       }
     }, {
-      count: voteCountDto.count
+      count: voteCountEntity.count,
+      updatedAt: voteCountEntity.updatedAt
     }, {
       upsert: true
     });
@@ -167,7 +168,8 @@ export class CampaignService {
     }, {
       $inc: {
         count: 1
-      }
+      },
+      updatedAt: new Date()
     }, {
       upsert: true
     });

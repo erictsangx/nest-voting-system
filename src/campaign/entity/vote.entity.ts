@@ -5,14 +5,16 @@ export class VoteEntity implements IVote {
   candidateId: string;
   campaignId: string;
   hkId: string;
+  addedAt: Date;
 
-  constructor(candidateId: string, campaignId: string, hkId: string) {
+  constructor(candidateId: string, campaignId: string, hkId: string, addedAt: Date) {
     this.candidateId = candidateId;
     this.campaignId = campaignId;
     this.hkId = hkId;
+    this.addedAt = addedAt;
   }
 
   static fromDoc(obj: Vote): VoteEntity {
-    return new VoteEntity(obj.candidateId, obj.campaignId, obj.hkId);
+    return new VoteEntity(obj.candidateId, obj.campaignId, obj.hkId, obj.addedAt);
   }
 }
