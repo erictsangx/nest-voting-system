@@ -149,6 +149,8 @@ export class CampaignService {
       $inc: {
         count: 1
       }
+    }, {
+      upsert: true
     });
   }
 }

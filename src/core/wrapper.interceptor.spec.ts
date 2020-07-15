@@ -2,13 +2,13 @@ import { WrapperInterceptor } from './wrapper.interceptor';
 import { from } from 'rxjs';
 import { Chance } from 'chance';
 
-const chance = new Chance();
+const rand = new Chance();
 const subject = new WrapperInterceptor();
 
 describe('WrapperInterceptor', () => {
   it('wrap responses', done => {
 
-    const expected = [undefined, chance.string(), null];
+    const expected = [undefined, rand.string(), null];
     const ob = from([...expected].reverse());
     const callHandler = {
       handle: () => {
