@@ -6,10 +6,11 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { WrapperInterceptor } from './core/wrapper.interceptor';
 import { CampaignModule } from './campaign/campaign.module';
 import { InvalidObjectIdExceptionFilter } from './core/invalid-object-id-exception.filter';
+import { Mongo } from './core/constants';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://mongoadmin:pass@localhost:27017/votingSystem?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false'),
+    MongooseModule.forRoot(Mongo.uri),
     AuthModule,
     UserModule,
     CampaignModule,

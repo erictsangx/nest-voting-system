@@ -15,9 +15,4 @@ export class UserService {
       }
     });
   }
-
-  async create(username: string, password: string): Promise<User | null> {
-    const _user = new this.userModel({ username, password });
-    return _user.save();
-  }
 }
