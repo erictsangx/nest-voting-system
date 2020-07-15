@@ -1,5 +1,5 @@
 import { Controller, Post, Request, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ErrorMessage } from './constants';
 import { LoginAuthGuard } from './login-auth.guard';
 import { Request as HttpRequest } from 'express';
@@ -18,6 +18,7 @@ export class AuthController {
       }
     }
   })
+  @ApiOperation({ summary: 'Return a JWT, expires in 2 hours' })
   @ApiUnauthorizedResponse({ description: ErrorMessage.LOGIN_FAILED })
   @UseGuards(LoginAuthGuard)
   @Post('/login')

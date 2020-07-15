@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query, UnprocessableEntityException } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
 import { CampaignService } from './campaign.service';
 import { VoteCountEntity } from './entity/vote-count.entity';
 import { VoteDto } from './dto/vote.dto';
@@ -38,6 +38,7 @@ export class CampaignController {
   }
 
   @ApiOperation({ summary: 'list votes by HK ID' })
+  @ApiQuery({ name: 'hkId', example: 'M6884593' })
   @ApiUnprocessableEntityResponse({ description: INVALID_HK_ID })
   @Get('/list-vote')
   async listVote(@Query('hkId') hkId: string): Promise<VoteEntity[]> {
