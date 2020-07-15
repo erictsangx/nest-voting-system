@@ -35,13 +35,13 @@ export class CampaignService {
     return toCampaignDto(result);
   }
 
-  // async findOne(campaignId: string): Promise<CampaignDto | null> {
-  //   const campaign = await this.campaignModel.findById(campaignId);
-  //   if (campaign != null) {
-  //     return toCampaignDto(campaign);
-  //   }
-  //   return null;
-  // }
+  async findOne(campaignId: string): Promise<CampaignDto | null> {
+    const campaign = await this.campaignModel.findById(campaignId);
+    if (campaign != null) {
+      return toCampaignDto(campaign);
+    }
+    return null;
+  }
 
   // async countVote(candidateId: string): Promise<CampaignDto | null> {
   //   const campaign = await this.campaignModel.findById(candidateId);
@@ -110,7 +110,7 @@ export class CampaignService {
     });
   }
 
-  async getVoteCount(candidateIds: string[]): Promise<VoteCountDto[] | null> {
+  async getVoteCount(candidateIds: string[]): Promise<VoteCountDto[]> {
     const list = await this.voteCountModel.find({
       candidateId: {
         $in: candidateIds

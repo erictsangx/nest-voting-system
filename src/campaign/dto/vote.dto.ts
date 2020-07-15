@@ -1,4 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
+import { privacyHash } from '../../core/math';
 
 export class VoteDto {
   @IsNotEmpty()
@@ -13,4 +14,9 @@ export class VoteDto {
     this.campaignId = campaignId;
     this.hkId = hkId;
   }
+
+  static hashed(dto: VoteDto): VoteDto {
+    return new VoteDto(dto.candidateId, dto.campaignId, privacyHash(dto.hkId));
+  }
+
 }
