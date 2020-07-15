@@ -1,12 +1,12 @@
 import * as crypto from 'crypto';
 
 /**
- * Hash without salting, SHOULD NOT USE FOR HASHING PASSWORD
+ * Hash with upper cases
  * @return base64 encoded and hashed string
  */
 export function privacyHash(str: string): string {
   const hash = crypto.createHash('sha512');
-  const data = hash.update(str, 'utf8');
+  const data = hash.update(str.toUpperCase(), 'utf8');
   return data.digest('base64');
 }
 

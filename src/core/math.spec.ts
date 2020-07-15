@@ -14,6 +14,10 @@ describe('Math', () => {
     const result2 = privacyHash(original);
     expect(result2).toBe(result);
 
+    //check upper case
+    const result3 = privacyHash(original.toLowerCase());
+    expect(result3).toBe(result);
+
     const expected = 'LckgaB9wCdzLVWjT43sJSsBxnZF47u0evPIiE8TQrXP3cQN+1rKEL33OaahWQfnjaD5IB+sgPVIevj+8AISfAg==';
     expect(privacyHash('WF1871640')).toBe(expected);
   });

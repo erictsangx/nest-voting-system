@@ -1,20 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Query, } from 'mongoose';
-import { Campaign, ICampaign } from './schema/campaign.schema';
+import { Campaign } from './schema/campaign.schema';
 import { VoteCount } from './schema/vote-count.schema';
 import { CampaignDto } from './dto/campaign.dto';
-import { VoteCountDto } from './dto/vote-count.dto';
+import { VoteCountEntity } from './entity/vote-count.entity';
 import { Vote } from './schema/vote.schema';
 import { VoteDto } from './dto/vote.dto';
-
-function toCampaignDto(obj: Campaign): CampaignDto {
-  return new CampaignDto(obj.title, obj.startTime, obj.endTime, obj.candidates, obj._id);
-}
-
-function toVoteCountDto(obj: VoteCount): VoteCountDto {
-  return new VoteCountDto(obj.candidateId, obj.count);
-}
+import { CampaignEntity } from './entity/campaign.entity';
+import { VoteEntity } from './entity/vote.entity';
 
 @Injectable()
 export class CampaignService {
@@ -25,20 +19,23 @@ export class CampaignService {
     @InjectModel('Vote') private readonly voteModel: Model<Vote>,
   ) {}
 
-  async create(createCampaignDto: ICampaign): Promise<CampaignDto | null> {
-    const campaign = new this.campaignModel(createCampaignDto);
+  /**
+   * create a campaign as well as creating voteCounts
+   */
+  async create(campaignDto: CampaignDto): Promise<CampaignEntity | null> {
+    const campaign = new this.campaignModel(campaignDto);
     const zeroCount = campaign.candidates.map(ele => {
       return { candidateId: ele.id, count: 0 };
     });
     await this.voteCountModel.insertMany(zeroCount);
     const result = await campaign.save();
-    return toCampaignDto(result);
+    return CampaignEntity.fromDoc(result);
   }
 
-  async findOne(campaignId: string): Promise<CampaignDto | null> {
+  async findOne(campaignId: string): Promise<CampaignEntity | null> {
     const campaign = await this.campaignModel.findById(campaignId);
     if (campaign != null) {
-      return toCampaignDto(campaign);
+      return CampaignEntity.fromDoc(campaign);
     }
     return null;
   }
@@ -51,7 +48,7 @@ export class CampaignService {
     });
   }
 
-  async upsertVoteCount(voteCountDto: VoteCountDto): Promise<Query<any>> {
+  async upsertVoteCount(voteCountDto: VoteCountEntity): Promise<Query<any>> {
     return this.voteCountModel.updateOne({
       candidateId: {
         $eq: voteCountDto.candidateId
@@ -66,7 +63,7 @@ export class CampaignService {
   /**
    * sort by total vote counts DESC
    */
-  async listAvailable(): Promise<CampaignDto[] | null> {
+  async listAvailable(): Promise<CampaignEntity[] | null> {
     const now = new Date();
     const list = await this.campaignModel
       .aggregate(
@@ -107,14 +104,14 @@ export class CampaignService {
         ]
       ).exec();
     return list.map((ele: any) => {
-      return toCampaignDto(ele);
+      return CampaignEntity.fromDoc(ele);
     });
   }
 
   /**
    * sort by endTime DESC
    */
-  async listExpired(): Promise<CampaignDto[] | null> {
+  async listExpired(): Promise<CampaignEntity[] | null> {
     const list = await this.campaignModel.find(({
       endTime: {
         $lt: new Date()
@@ -124,11 +121,15 @@ export class CampaignService {
     }).exec();
 
     return list.map((ele) => {
-      return toCampaignDto(ele);
+      return CampaignEntity.fromDoc(ele);
     });
   }
 
-  async getVoteCount(candidateIds: string[]): Promise<VoteCountDto[]> {
+  /**
+   * list all vote counts corresponding to the candidateId
+   * @param candidateIds
+   */
+  async listVoteCount(candidateIds: string[]): Promise<VoteCountEntity[]> {
     const list = await this.voteCountModel.find({
       candidateId: {
         $in: candidateIds
@@ -136,7 +137,7 @@ export class CampaignService {
     });
 
     return list.map((ele) => {
-      return toVoteCountDto(ele);
+      return VoteCountEntity.fromDoc(ele);
     });
   }
 
@@ -144,10 +145,11 @@ export class CampaignService {
    * Mongo UNIQUE COMPOUND INDEX(campaignId, hkId)
    * Ignore duplicated votes
    */
-  async createVote(voteDto: VoteDto): Promise<Vote | null> {
+  async createVote(voteDto: VoteDto): Promise<VoteEntity | null> {
     const vote = new this.voteModel(voteDto);
     try {
-      return await vote.save();
+      const result = await vote.save();
+      return VoteEntity.fromDoc(result);
     } catch (err) {
       console.warn(err.message);
       return null;
@@ -156,10 +158,9 @@ export class CampaignService {
 
   /**
    * Increase vote count by 1
-   * @param candidateId
    */
-  async incVoteCount(candidateId: string): Promise<VoteCount | null> {
-    return this.voteCountModel.updateOne({
+  async incVoteCount(candidateId: string): Promise<VoteCountEntity | null> {
+    const result = await this.voteCountModel.updateOne({
       candidateId: {
         $eq: candidateId
       }
@@ -170,16 +171,17 @@ export class CampaignService {
     }, {
       upsert: true
     });
+    return VoteCountEntity.fromDoc(result);
   }
 
-  async listVote(hkId: string): Promise<VoteDto[]> {
+  async listVote(hkId: string): Promise<VoteEntity[]> {
     const list = await this.voteModel.find({
       hkId: {
         $eq: hkId
       }
     });
     return list.map(v => {
-      return new VoteDto(v.candidateId, v.campaignId, v.hkId);
+      return VoteEntity.fromDoc(v);
     });
   }
 }

@@ -10,7 +10,8 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CampaignService } from './campaign.service';
 import { Types } from 'mongoose';
 import { CampaignDto } from './dto/campaign.dto';
-import { VoteCountDto } from './dto/vote-count.dto';
+import { VoteCountEntity } from './entity/vote-count.entity';
+import { CampaignEntity } from './entity/campaign.entity';
 
 const INVALID_DATE = 'startTime > endTime';
 
@@ -25,14 +26,13 @@ export class AdminCampaignController {
   @Post('/create')
   @ApiCreatedResponse({ type: CampaignDto })
   @ApiUnprocessableEntityResponse({ description: INVALID_DATE })
-  async create(@Body() campaignDto: CampaignDto): Promise<CampaignDto | null> {
+  async create(@Body() campaignDto: CampaignDto): Promise<CampaignEntity | null> {
 
     if (campaignDto.startTime > campaignDto.endTime) {
       throw  new UnprocessableEntityException(INVALID_DATE);
     }
 
-    //sanitize ids
-    campaignDto.id = undefined;
+    //create ids for candidates
     campaignDto.candidates = campaignDto
       .candidates
       .map(ele => {
@@ -45,13 +45,13 @@ export class AdminCampaignController {
   @ApiOperation({ summary: 'Count all votes of a campaign and update the corresponding vote count' })
   @Post('/confirm-vote-count')
   async confirmVoteCount(@Query('campaignId') campaignId: string) {
-    const campaign = await this.campaignService.findOne(campaignId)
+    const campaign = await this.campaignService.findOne(campaignId);
 
     if (campaign == null) {return;}
 
     for (const candidate of campaign.candidates) {
-      const counting = await this.campaignService.countVote(candidate.id!);
-      await this.campaignService.upsertVoteCount(new VoteCountDto(candidate.id!, counting));
+      const counting = await this.campaignService.countVote(candidate.id);
+      await this.campaignService.upsertVoteCount(new VoteCountEntity(candidate.id, counting));
     }
   }
 }

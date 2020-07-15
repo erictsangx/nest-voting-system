@@ -1,14 +1,7 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
+import { ICandidate } from '../interface/candidate.interface';
 
-export class CandidateDto {
+export class CandidateDto implements ICandidate {
   @IsNotEmpty()
-  name: string;
-
-  @IsOptional()
-  id?: string;
-
-  constructor(name: string, id: string) {
-    this.name = name;
-    this.id = id;
-  }
+  name!: string;
 }

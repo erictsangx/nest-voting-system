@@ -1,25 +1,11 @@
 import { IsNotEmpty } from 'class-validator';
-import { privacyHash } from '../../core/math';
+import { IVote } from '../interface/vote.interface';
 
-export class VoteDto {
+export class VoteDto implements IVote {
   @IsNotEmpty()
-  candidateId: string;
+  candidateId!: string;
   @IsNotEmpty()
-  campaignId: string;
+  campaignId!: string;
   @IsNotEmpty()
-  hkId: string;
-
-  constructor(candidateId: string, campaignId: string, hkId: string) {
-    this.candidateId = candidateId;
-    this.campaignId = campaignId;
-    this.hkId = hkId;
-  }
-
-  /**
-   * Convert with hashed uppercase [hkId]
-   */
-  static hashed(dto: VoteDto): VoteDto {
-    return new VoteDto(dto.candidateId, dto.campaignId, privacyHash(dto.hkId.toUpperCase()));
-  }
-
+  hkId!: string;
 }

@@ -2,10 +2,11 @@ import { Body, Controller, Get, Post, Query, UnprocessableEntityException } from
 import { ApiOkResponse, ApiOperation, ApiTags, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
 import { CampaignDto } from './dto/campaign.dto';
 import { CampaignService } from './campaign.service';
-import { VoteCountDto } from './dto/vote-count.dto';
+import { VoteCountEntity } from './entity/vote-count.entity';
 import { VoteDto } from './dto/vote.dto';
 import { privacyHash, validateHKID } from '../core/math';
-import { Vote } from './schema/vote.schema';
+import { CampaignEntity } from './entity/campaign.entity';
+import { VoteEntity } from './entity/vote.entity';
 
 const INVALID_HK_ID = 'Invalid HK ID';
 const INVALID_CAMPAIGN = 'Campaign not existed or expired';
@@ -18,35 +19,32 @@ export class CampaignController {
   constructor(private readonly campaignService: CampaignService) {}
 
   @ApiOperation({ summary: 'available campaigns (startTime<=now<=endTime, sort by total votes DESC)' })
-  @ApiOkResponse({ type: [CampaignDto] })
   @Get('list/available')
-  async listAvailable(): Promise<CampaignDto[] | null> {
+  async listAvailable(): Promise<CampaignEntity[] | null> {
     return this.campaignService.listAvailable();
   }
 
   @ApiOperation({ summary: 'expired campaigns (endTime<now, order by endTime, sort by endTime DESC)' })
-  @ApiOkResponse({ type: [CampaignDto] })
   @Get('list/expired')
-  async listExpired(): Promise<CampaignDto[] | null> {
+  async listExpired(): Promise<CampaignEntity[] | null> {
     return this.campaignService.listExpired();
   }
 
   @ApiOperation({ summary: 'vote counting of candidates' })
-  @ApiOkResponse({ type: [VoteCountDto] })
   @Post('count')
-  async count(@Body() candidateIds: string[]): Promise<VoteCountDto[]> {
-    return this.campaignService.getVoteCount(candidateIds);
+  async count(@Body() candidateIds: string[]): Promise<VoteCountEntity[]> {
+    return this.campaignService.listVoteCount(candidateIds);
   }
 
   @ApiOperation({ summary: 'list votes by HK ID' })
   @ApiUnprocessableEntityResponse({ description: INVALID_HK_ID })
   @Get('/list-vote')
-  async listVote(@Query('hkId') hkId: string): Promise<VoteDto[]> {
+  async listVote(@Query('hkId') hkId: string): Promise<VoteEntity[]> {
     //validate HK ID
     if (!validateHKID(hkId)) {
       throw new UnprocessableEntityException(INVALID_HK_ID);
     }
-    return this.campaignService.listVote(privacyHash(hkId.toUpperCase()));
+    return this.campaignService.listVote(privacyHash(hkId));
   }
 
   @ApiOperation({
@@ -76,7 +74,9 @@ export class CampaignController {
       throw new UnprocessableEntityException(INVALID_CANDIDATE);
     }
 
-    const inserted = await this.campaignService.createVote(VoteDto.hashed(voteDto));
+    voteDto.hkId = privacyHash(voteDto.hkId);
+    const inserted = await this.campaignService.createVote(voteDto);
+
     //inc vote count if voting succeed
     if (inserted != null) {
       await this.campaignService.incVoteCount(inserted.candidateId);

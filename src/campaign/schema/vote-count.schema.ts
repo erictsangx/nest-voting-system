@@ -1,8 +1,9 @@
 import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { IVoteCount } from '../interface/vote-count.interface';
 
 @Schema()
-export class VoteCount extends Document {
+export class VoteCount extends Document implements IVoteCount {
   @Prop({ required: true })
   candidateId!: string;
   @Prop({ required: true })
