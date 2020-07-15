@@ -16,14 +16,26 @@ describe('WrapperInterceptor', () => {
       }
     };
 
-    subject.intercept({} as any, callHandler)
+    const mockCtx = {
+      switchToHttp: function () {
+        return {
+          getResponse: function () {
+            return {
+              statusCode: 201
+            };
+          }
+        };
+      }
+    };
+
+    subject.intercept(mockCtx as any, callHandler)
       .subscribe({
         next: v => {
           const tmp = expected.pop();
           const result = tmp == undefined ? null : tmp;
           expect(v).toEqual({
             result,
-            statusCode: 200,
+            statusCode: 201,
             message: ''
           });
         },

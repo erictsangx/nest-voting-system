@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Post, Query, UnprocessableEntityException } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
-import { CampaignDto } from './dto/campaign.dto';
+import { ApiOperation, ApiTags, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
 import { CampaignService } from './campaign.service';
 import { VoteCountEntity } from './entity/vote-count.entity';
 import { VoteDto } from './dto/vote.dto';
@@ -44,7 +43,12 @@ export class CampaignController {
     if (!validateHKID(hkId)) {
       throw new UnprocessableEntityException(INVALID_HK_ID);
     }
-    return this.campaignService.listVote(privacyHash(hkId));
+    const list = await this.campaignService.listVote(privacyHash(hkId));
+    //sanitize hkId
+    return list.map(v => {
+      v.hkId = '';
+      return v;
+    });
   }
 
   @ApiOperation({

@@ -1,13 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { WrapperInterceptor } from './core/wrapper.interceptor';
 import { CampaignModule } from './campaign/campaign.module';
+import { InvalidObjectIdExceptionFilter } from './core/invalid-object-id-exception.filter';
 
 @Module({
   imports: [
@@ -16,13 +14,21 @@ import { CampaignModule } from './campaign/campaign.module';
     UserModule,
     CampaignModule,
   ],
-  controllers: [AppController],
   providers: [
     {
       provide: APP_INTERCEPTOR,
       useClass: WrapperInterceptor,
     },
-    AppService
+    {
+      provide: APP_FILTER,
+      useClass: InvalidObjectIdExceptionFilter
+    },
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true
+      })
+    },
   ],
 })
 export class AppModule {}

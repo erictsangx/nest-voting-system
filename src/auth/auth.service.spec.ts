@@ -23,10 +23,13 @@ describe('AuthService', () => {
     findOne: async function (username: string) {
       const pass = await argon2.hash(userA.password, { type: argon2.argon2id });
       const tmp = {
-        ...userA, toObject: function () {
+        ...userA,
+        toObject: function () {
           return this;
-        }
+        },
+        _id: userA.id
       };
+      delete tmp.id;
       tmp.password = pass;
       return tmp.username == username ? tmp : null;
     }

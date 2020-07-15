@@ -1,11 +1,9 @@
 import { IVote } from '../interface/vote.interface';
-import { Exclude } from 'class-transformer';
 import { Vote } from '../schema/vote.schema';
 
 export class VoteEntity implements IVote {
   candidateId: string;
   campaignId: string;
-  @Exclude()
   hkId: string;
 
   constructor(candidateId: string, campaignId: string, hkId: string) {

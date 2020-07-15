@@ -24,7 +24,10 @@ export class CampaignEntity implements ICampaign {
   }
 
   static fromDoc(obj: Campaign): CampaignEntity {
-    return new CampaignEntity(obj.title, obj.startTime, obj.endTime, obj.candidates, obj._id);
+    const candidates = obj.candidates.map(v => {
+      return new CandidateEntity(v.name, v.id);
+    });
+    return new CampaignEntity(obj.title, obj.startTime, obj.endTime, candidates, obj._id);
   }
 
 }

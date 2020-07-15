@@ -13,9 +13,11 @@ export class AuthService {
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findOne(username);
     if (user && await argon2.verify(user.password, pass)) {
-      //remove password for signing jwt
-      const { password, ...result } = user.toObject();
-      return result;
+      //Never set password here
+      return {
+        id: user._id,
+        username: user.username
+      };
     }
     return null;
   }
