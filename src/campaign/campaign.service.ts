@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, } from 'mongoose';
+import { Model, Query, } from 'mongoose';
 import { Campaign, ICampaign } from './schema/campaign.schema';
 import { VoteCount } from './schema/vote-count.schema';
 import { CampaignDto } from './dto/campaign.dto';
@@ -43,13 +43,25 @@ export class CampaignService {
     return null;
   }
 
-  // async countVote(candidateId: string): Promise<CampaignDto | null> {
-  //   const campaign = await this.campaignModel.findById(candidateId);
-  //   if (campaign != null) {
-  //     return toCampaignDto(campaign);
-  //   }
-  //   return null;
-  // }
+  async countVote(candidateId: string): Promise<number> {
+    return this.voteModel.countDocuments({
+      candidateId: {
+        $eq: candidateId
+      }
+    });
+  }
+
+  async upsertVoteCount(voteCountDto: VoteCountDto): Promise<Query<any>> {
+    return this.voteCountModel.updateOne({
+      candidateId: {
+        $eq: voteCountDto.candidateId
+      }
+    }, {
+      count: voteCountDto.count
+    }, {
+      upsert: true
+    });
+  }
 
   async listAvailable(): Promise<CampaignDto[] | null> {
     const list = await this.campaignModel

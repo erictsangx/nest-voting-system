@@ -1,7 +1,6 @@
 import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CandidateDto } from '../dto/candidate.dto';
-import { CampaignDto } from '../dto/campaign.dto';
 
 export interface ICampaign {
   title: string;
@@ -31,20 +30,3 @@ export class Campaign extends Document implements ICampaign {
 }
 
 export const CampaignSchema = SchemaFactory.createForClass(Campaign);
-
-// CampaignSchema.methods.toDto = function (): CampaignDto {
-//   const obj = this.toObject();
-//   return new CampaignDto(obj.title, obj.startTime, obj.endTime, obj.candidates, obj._id);
-// };
-//
-// export { CampaignSchema };
-
-// export const CampaignSchema = new mongoose.Schema({
-//   title: String,
-//   startTime: Date,
-//   endTime: Date,
-//   candidates: {
-//     name: String,
-//     id: { type: mongoose.Types.ObjectId, default: mongoose.Types.ObjectId() }
-//   }
-// });

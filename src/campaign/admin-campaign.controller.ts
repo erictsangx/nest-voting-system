@@ -1,11 +1,16 @@
-import { Body, Controller, Get, Post, Query, UnprocessableEntityException, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
+import { Body, Controller, Post, Query, UnprocessableEntityException, UseGuards } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnprocessableEntityResponse
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CampaignService } from './campaign.service';
-import { Campaign } from './schema/campaign.schema';
 import { Types } from 'mongoose';
 import { CampaignDto } from './dto/campaign.dto';
-import { VoteCount } from './schema/vote-count.schema';
+import { VoteCountDto } from './dto/vote-count.dto';
 
 const INVALID_DATE = 'startTime > endTime';
 
@@ -18,7 +23,7 @@ export class AdminCampaignController {
   constructor(private readonly campaignService: CampaignService) {}
 
   @Post('/create')
-  @ApiResponse({ status: 201, type: CampaignDto })
+  @ApiCreatedResponse({ type: CampaignDto })
   @ApiUnprocessableEntityResponse({ description: INVALID_DATE })
   async create(@Body() campaignDto: CampaignDto): Promise<CampaignDto | null> {
 
@@ -37,15 +42,16 @@ export class AdminCampaignController {
     return await this.campaignService.create(campaignDto);
   }
 
-  // @Get('/confirm-vote-count')
-  // @ApiResponse({ status: 201, description: 'Count all votes of a campaign and update the corresponding vote count' })
-  // @ApiUnprocessableEntityResponse({ description: INVALID_DATE })
-  // async confirmVoteCount(@Query('campaignId') campaignId: string) {
-  //   const campaign = await this.campaignService.findOne(campaignId);
-  //
-  //   const countings = campaign?.candidates.forEach(ele => {
-  //     this.campaignService.countVote(ele.id)
-  //   });
-  //   console.log('campaign', campaign);
-  // }
+  @ApiOperation({ summary: 'Count all votes of a campaign and update the corresponding vote count' })
+  @Post('/confirm-vote-count')
+  async confirmVoteCount(@Query('campaignId') campaignId: string) {
+    const campaign = await this.campaignService.findOne(campaignId)
+
+    if (campaign == null) {return;}
+
+    for (const candidate of campaign.candidates) {
+      const counting = await this.campaignService.countVote(candidate.id!);
+      await this.campaignService.upsertVoteCount(new VoteCountDto(candidate.id!, counting));
+    }
+  }
 }
