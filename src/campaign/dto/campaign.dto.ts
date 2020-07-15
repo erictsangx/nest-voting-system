@@ -1,5 +1,5 @@
 import { ICampaign } from '../schema/campaign.schema';
-import { IsDate, IsEmpty, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsDate, IsEmpty, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 
 import { CandidateDto } from './candidate.dto';
@@ -28,6 +28,11 @@ export class CampaignDto implements ICampaign {
     this.endTime = endTime;
     this.candidates = candidates;
     this.id = id;
+  }
+
+  isAvailable(): boolean {
+    const now = new Date();
+    return (this.startTime <= now && now <= this.endTime);
   }
 
 }

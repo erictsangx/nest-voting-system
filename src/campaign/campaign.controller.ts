@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, UnprocessableEntityException } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UnprocessableEntityException } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
 import { CampaignDto } from './dto/campaign.dto';
 import { CampaignService } from './campaign.service';
 import { VoteCountDto } from './dto/vote-count.dto';
 import { VoteDto } from './dto/vote.dto';
-import { validateHKID } from '../core/math';
+import { privacyHash, validateHKID } from '../core/math';
+import { Vote } from './schema/vote.schema';
 
 const INVALID_HK_ID = 'Invalid HK ID';
 const INVALID_CAMPAIGN = 'Campaign not existed or expired';
@@ -32,9 +33,20 @@ export class CampaignController {
 
   @ApiOperation({ summary: 'vote counting of candidates' })
   @ApiOkResponse({ type: [VoteCountDto] })
-  @Get('count')
+  @Post('count')
   async count(@Body() candidateIds: string[]): Promise<VoteCountDto[]> {
     return this.campaignService.getVoteCount(candidateIds);
+  }
+
+  @ApiOperation({ summary: 'list votes by HK ID' })
+  @ApiUnprocessableEntityResponse({ description: INVALID_HK_ID })
+  @Get('/list-vote')
+  async listVote(@Query('hkId') hkId: string): Promise<VoteDto[]> {
+    //validate HK ID
+    if (!validateHKID(hkId)) {
+      throw new UnprocessableEntityException(INVALID_HK_ID);
+    }
+    return this.campaignService.listVote(privacyHash(hkId.toUpperCase()));
   }
 
   @ApiOperation({
@@ -52,7 +64,7 @@ export class CampaignController {
 
     //check campaign existed and available
     const campaign = await this.campaignService.findOne(voteDto.campaignId);
-    if (!campaign) {
+    if (!campaign?.isAvailable()) {
       throw new UnprocessableEntityException(INVALID_CAMPAIGN);
     }
 

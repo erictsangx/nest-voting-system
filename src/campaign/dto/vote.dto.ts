@@ -15,8 +15,11 @@ export class VoteDto {
     this.hkId = hkId;
   }
 
+  /**
+   * Convert with hashed uppercase [hkId]
+   */
   static hashed(dto: VoteDto): VoteDto {
-    return new VoteDto(dto.candidateId, dto.campaignId, privacyHash(dto.hkId));
+    return new VoteDto(dto.candidateId, dto.campaignId, privacyHash(dto.hkId.toUpperCase()));
   }
 
 }

@@ -63,17 +63,21 @@ export class CampaignService {
     });
   }
 
+  /**
+   * sort by total vote counts DESC
+   */
   async listAvailable(): Promise<CampaignDto[] | null> {
+    const now = new Date();
     const list = await this.campaignModel
       .aggregate(
         [
           {
             '$match': {
               'startTime': {
-                '$lte': new Date()
+                '$lte': now
               },
               'endTime': {
-                '$gte': new Date()
+                '$gte': now
               }
             }
           }, {
@@ -107,11 +111,13 @@ export class CampaignService {
     });
   }
 
+  /**
+   * sort by endTime DESC
+   */
   async listExpired(): Promise<CampaignDto[] | null> {
-    const now = new Date();
     const list = await this.campaignModel.find(({
       endTime: {
-        $lt: now
+        $lt: new Date()
       }
     })).sort({
       endTime: -1
@@ -163,6 +169,17 @@ export class CampaignService {
       }
     }, {
       upsert: true
+    });
+  }
+
+  async listVote(hkId: string): Promise<VoteDto[]> {
+    const list = await this.voteModel.find({
+      hkId: {
+        $eq: hkId
+      }
+    });
+    return list.map(v => {
+      return new VoteDto(v.candidateId, v.campaignId, v.hkId);
     });
   }
 }
