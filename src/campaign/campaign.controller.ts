@@ -81,8 +81,7 @@ export class CampaignController {
       throw new UnprocessableEntityException(INVALID_CANDIDATE);
     }
 
-    voteDto.hkId = privacyHash(voteDto.hkId);
-    const inserted = await this.campaignService.createVote(voteDto);
+    const inserted = await this.campaignService.createVote(VoteEntity.fromDto(voteDto));
 
     //inc vote count if voting succeed
     if (inserted != null) {

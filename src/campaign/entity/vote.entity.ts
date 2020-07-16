@@ -1,5 +1,7 @@
 import { IVote } from '../interface/vote.interface';
 import { Vote } from '../schema/vote.schema';
+import { VoteDto } from '../dto/vote.dto';
+import { privacyHash } from '../../core/math';
 
 export class VoteEntity implements IVote {
   candidateId: string;
@@ -16,5 +18,9 @@ export class VoteEntity implements IVote {
 
   static fromDoc(obj: Vote): VoteEntity {
     return new VoteEntity(obj.candidateId, obj.campaignId, obj.hkId, obj.addedAt);
+  }
+
+  static fromDto(obj: VoteDto): VoteEntity {
+    return new VoteEntity(obj.candidateId, obj.campaignId, privacyHash(obj.hkId), new Date());
   }
 }

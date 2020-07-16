@@ -146,8 +146,8 @@ export class CampaignService {
    * Mongo UNIQUE COMPOUND INDEX(campaignId, hkId)
    * Ignore duplicated votes
    */
-  async createVote(voteDto: VoteDto): Promise<VoteEntity | null> {
-    const vote = new this.voteModel(voteDto);
+  async createVote(voteEntity: VoteEntity): Promise<VoteEntity | null> {
+    const vote = new this.voteModel(voteEntity);
     try {
       const result = await vote.save();
       return VoteEntity.fromDoc(result);
