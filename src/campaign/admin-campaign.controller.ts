@@ -25,7 +25,7 @@ export class AdminCampaignController {
   constructor(private readonly campaignService: CampaignService) {}
 
   @Post('/create')
-  @ApiCreatedResponse({ type: CampaignDto })
+  @ApiCreatedResponse({ type: CampaignEntity })
   @ApiUnprocessableEntityResponse({ description: INVALID_DATE })
   async create(@Body() campaignDto: CampaignDto): Promise<CampaignEntity | null> {
 
